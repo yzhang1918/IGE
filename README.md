@@ -1,0 +1,2 @@
+# IGE
+Interaction Graph Embedding
