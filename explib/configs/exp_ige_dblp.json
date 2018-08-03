@@ -1,0 +1,14 @@
+{
+  "exp_name": "exp_ige_dblp",
+  "use_mini": true,
+  "emb_dim": 32,
+  "n_factors": 6,
+  "distortion": 0.75,
+  "n_samples": 10,
+  "hidden_units": [16],
+  "lr": 0.001,
+  "n_epochs": 3,
+  "batch_size": 128,
+  "summary_every": 100,
+  "save_every": 1000
+}
