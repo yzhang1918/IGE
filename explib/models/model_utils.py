@@ -7,25 +7,24 @@ class UnigramSampler(nn.Module):
 
     def __init__(self, vocab_size, distortion):
         super().__init__()
-        self.counter = torch.ones(vocab_size, requires_grad=False)
+        self.vocab_size = vocab_size
         self.distortion = distortion
-        self.cuda_flag = torch.cuda.is_available()
+        self.weights = None
+
+    def init_weights(self, freqs):
+        if torch.cuda.is_available():
+            freqs = torch.cuda.FloatTensor(freqs)
+        else:
+            freqs = torch.FloatTensor(freqs)
+        self.weights = freqs ** self.distortion
 
     def forward(self, n):
         return self.sample(n)
 
     def sample(self, n):
         with torch.no_grad():
-            samples = torch.multinomial(self.counter ** self.distortion, n, True)
-            if self.cuda_flag:
-                samples = samples.cuda()
+            samples = torch.multinomial(self.weights, n, True)
         return samples
-
-    def update(self, idx):
-        """
-        BUG: the same values in idx only result in one update.
-        """
-        self.counter[idx] += 1
 
 
 class AttributedEmbedding(nn.Module):

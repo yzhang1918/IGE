@@ -31,12 +31,19 @@ class DBLPPairwiseLoader(BaseLoader):
         y_dataset = PairDBLPDataset(df, p_attrs, y_pairs)
 
         self.x_loader = DataLoader(x_dataset, config.batch_size,
-                                   shuffle=True, pin_memory=True)
+                                   shuffle=True, pin_memory=True,
+                                   num_workers=config.n_loader_workers)
         self.y_loader = DataLoader(y_dataset, config.batch_size,
-                                   shuffle=True, pin_memory=True)
+                                   shuffle=True, pin_memory=True,
+                                   num_workers=config.n_loader_workers)
         # update config
         self.n_lnodes = len(df.iloc[:, 0].unique())
         self.n_rnodes = len(df.iloc[:, 1].unique())
+        self.x_freqs = np.zeros(self.n_lnodes, dtype=np.int64)
+        self.y_freqs = np.zeros(self.n_rnodes, dtype=np.int64)
+        for u, v, *_ in df.itertuples(False):
+            self.x_freqs[u] += 1
+            self.y_freqs[v] += 1
         config.n_raw_attrs = p_attrs.shape[1]
         config.x_size = self.n_lnodes
         config.y_size = self.n_rnodes

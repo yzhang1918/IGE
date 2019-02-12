@@ -10,5 +10,6 @@
   "n_epochs": 3,
   "batch_size": 128,
   "summary_every": 100,
+  "n_loader_workers": 4,
   "save_every": 1000
 }

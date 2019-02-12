@@ -6,6 +6,7 @@ class PairwiseTrainer(BaseTrainer):
     def __init__(self, model, data, logger, evaluator, config):
         super().__init__(model, data, logger, config)
         self.evaluator = evaluator
+        self.model.init_sampler(data.x_freqs, data.y_freqs)
 
     def train(self):
         print('==== Before Training ===='.format(self.model.global_epoch))

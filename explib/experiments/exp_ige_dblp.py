@@ -12,6 +12,8 @@ from explib.utils.io import create_dirs
 
 def main():
     args = get_args()
+    if args.config is "None":
+        args.config = "explib/configs/exp_ige_dblp.json"
     config = process_config(args.config)
 
     create_dirs([config.summary_dir, config.ckpt_dir])

@@ -2,8 +2,10 @@ import torch
 from torch import nn, optim
 from torch.nn import functional as F
 
-from .model_utils import (UnigramSampler, AttributedEmbedding,
-                          AttributedNSSoftmax, NSSoftmax)
+from .model_utils import (UnigramSampler,
+                          AttributedEmbedding,
+                          AttributedNSSoftmax,
+                          NSSoftmax)
 from .base_model import BaseModel
 
 
@@ -19,6 +21,10 @@ class IGEModel(BaseModel):
             model = model.cuda()
         optimizer = optim.Adam(model.parameters(), lr=config.lr)
         super().__init__(model, optimizer, config)
+
+    def init_sampler(self, x_freqs, y_freqs):
+        self.model.x_sampler.init_weights(x_freqs)
+        self.model.y_sampler.init_weights(y_freqs)
 
     def train_step(self, source_x, source_y, source_attr,
                    target, target_attr, x2y):
@@ -84,7 +90,6 @@ class IGE(nn.Module):
             y_vec = self.y_emb(source_y, source_d)
             # Softmax Layer
             neg_targets = self.y_sampler.sample(self.n_samples)
-            self.y_sampler.update(target)
             p1, n1 = self.x2y_softmax(x_vec, target, neg_targets)
             p2, n2 = self.x2y_attributed_softmax(y_vec, target_d, target, neg_targets)
         else:
@@ -93,7 +98,6 @@ class IGE(nn.Module):
             y_vec = self.y_emb(source_y)
             # Softmax Layer
             neg_targets = self.x_sampler.sample(self.n_samples)
-            self.x_sampler.update(target)
             p1, n1 = self.y2x_softmax(y_vec, target, neg_targets)
             p2, n2 = self.y2x_attributed_softmax(x_vec, target_d, target, neg_targets)
         pos_logits = p1 + p2
